@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta name="viewport" content="width=device-width" />
+		<title>tree</title>
+		<meta charset="utf-8">
+		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Expires" content="0" />
+		<link type="image/x-icon" rel="shortcut icon" href="favicon.ico" />
+		<link type="text/css" href="css/layer.css"/>
+		<style>
+			#table-component-div {
+				width: 300px;
+				padding-right: 20px;
+			}
+			
+			#table-component-div ul li,
+			#table-component-div ul {
+				color: #000000;
+				font-size: 0;
+			}
+			
+			#table-component-div ul {
+				padding-left: 15px;
+				display: none;
+			}
+			
+			#table-component-div ul.active {
+				display: block;
+			}
+			
+			#table-component-div>ul {
+				display: block;
+			}
+			
+			#table-component-div li p {
+				background: url(img/common_tree_4.png) 35px center no-repeat;
+				background-size: 25px 30px;
+				padding-left: 70px;
+				line-height: 45px;
+				font-size: 20px;
+				border-bottom: 1px solid #e6e6e6;
+				cursor: pointer;
+				position: relative;
+			}
+			
+			#table-component-div .all.active {
+				background-color: #d1efd1;
+			}
+			
+			#table-component-div .hasChild {
+				position: relative;
+				padding-left: 20px;
+			}
+			
+			#table-component-div .hasChild>p {
+				background: url(img/common_tree_5.png) left 10px no-repeat;
+				background-size: 40px 30px;
+				padding-left: 45px;
+			}
+			
+			#table-component-div .hasChild:before {
+				position: absolute;
+				top: 15px;
+				left: 0;
+				content: '';
+				display: inline-block;
+				width: 15px;
+				height: 15px;
+				background: url(img/common_tree_2.png) no-repeat;
+				background-size: contain;
+			}
+			
+			#table-component-div .hasChild.active:before {
+				background: url(img/common_tree_1.png) center no-repeat;
+				background-size: contain;
+			}
+			
+			#table-component-div .hasChild.active>p {
+				background: url(img/common_tree_3.png) left 10px no-repeat;
+				background-size: 40px 30px;
+			}
+			
+			#table-component-div .hasChild p.active {
+				background-color: #d1efd1;
+			}
+			#table-component-div .menubtn{
+				display: none;
+				position: absolute;
+				top: -15px;
+				left: 0;
+				width: 50px;
+				height: 20px;
+				font-size: 14px;
+				text-align: center;
+				line-height: 20px;
+				color: #ffffff;
+			}
+			#table-component-div .menubtn.active{
+				display: block;
+			}
+			#table-component-div .menubtn.red{
+				background: #ff0000;
+				left: 110px;
+			}
+			#table-component-div .menubtn.blue{
+				background: #3399FF;
+			}
+			#table-component-div .checkbox{
+				border: 2px solid #3399FF;
+				display: inline-block;
+				vertical-align: middle;
+				width: 15px;
+				height: 15px;
+			}
+			#table-component-div .checkbox.active{
+				background: #3399FF;
+			}
+			#table-component-div li.active>ul{
+				display: block;
+			}
+			#table-component-div p.live{
+				background-color: #E5EFF7 !important;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="table-component-div">
+			正在备选的项：{{treedata.liveid.id}}：{{treedata.liveid.name}}
+			<table-component  v-for="item in treedata.list" v-bind:list="item" v-bind:checkdata="treedata.checkListData" v-bind:activeid="treedata.liveid" ></table-component>
+		</div>
+		<div id="create" style="display: none;    padding: 20px;">
+			<p>请输入名称！</p>
+			<input placeholder="请输入名称" id="name"/>
+		</div>
+		<div id="del" style="display: none;    padding: 20px;">
+			<p>确定删除吗！</p>
+		</div>
+	</body>
+	
+	<script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="js/layer.js"></script>
+	<script type="text/javascript" src="js/vue.js"></script>
+	<script type="text/x-template" id="table-component-template">
+	    <ul class="">
+	        <li  v-bind:class="{'hasChild ':(list.child && list.child.length)}">
+	        	
+	            <p v-bind:class="{'parent ':(list.child && list.child.length)}" v-on:click.stop="showlist($event,list)" v-on:contextmenu.prevent="showMenu($event)">
+            	{{list.name}}
+	            <!--<span class="checkbox" v-on:click="checkList(list,$event)"></span>-->
+	            <span class="menubtn blue" v-on:click="setlist(1,list)">新建</span>
+	            <span class="menubtn blue" v-on:click="setlist(2,list)" style="left: 55px;">修改</span>
+	            <span class="menubtn red" v-on:click="setlist(3,list)">删除</span>
+	            </p>
+	            <table-component v-for="itemc in list.child" v-bind:list="itemc" v-bind:checkdata="checkdata" v-bind:activeid="activeid" ></table-component>
+	        </li>
+	    </ul>
+	</script>
+	<script>
+	 /* 数据结构 */
+        var ko_vue_data=[
+            {
+                name: "javascript",
+                id:'1',
+                child: [
+                    {
+                        name: "array",
+                		id:'2',
+                        child: []
+                    },
+                    {
+                        name: "array",
+                		id:'3',
+                        child: []
+                    },
+                    {
+                        name: "number",
+                		id:'4',
+                        child: [
+                            {
+                                name: "int",
+                				id:'5',
+                                child: []
+                            },
+                            {
+                                name: "int",
+                				id:'6',
+                                child: []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+        /* 注册组件 */
+        Vue.component('table-component', {
+            template:"#table-component-template",//模板
+            props:['list','checkdata','activeid'],//传递数据
+            methods:{
+                showlist:function(event,list){//左键打开文件夹
+                    var _this = $(event.currentTarget);//点击的对象
+                    if(event.target.nodeName!='SPAN'){
+	                    _this.parent('li').toggleClass('active');
+	                	$('#table-component-div .menubtn').removeClass('active');
+	                	$('#table-component-div p').removeClass('live');
+	                	_this.addClass('live');
+	                	Vue.set(this.activeid,['id'],list.id);
+	                	Vue.set(this.activeid,['name'],list.name);
+                    }
+                },
+                showMenu:function(event){//右键出现菜单
+                	var _this = $(event.currentTarget);//点击的对象
+                	$('#table-component-div .menubtn').removeClass('active');
+                    _this.children('.menubtn').addClass('active');
+                },
+                checkList:function(list,event){//点击checkbox
+                	$(event.currentTarget).toggleClass('active');
+//              	if($(event.currentTarget).hasClass('active')){
+//              		$(event.currentTarget).parent('p').siblings().find('.checkbox').addClass('active');
+//              	}else{
+////              		$(event.currentTarget).parents('li.hasChild').find('.parent .checkbox').removeClass('active');
+//              		$(event.currentTarget).parent('p').siblings().find('.checkbox').removeClass('active');
+//              	}
+                	if(this.checkdata[list.id]){
+                		delete this.checkdata[list.id];
+                	}else{
+                		this.checkdata[list.id] = list.name;
+                	}
+                	console.log(this.checkdata)
+                	this.$emit('checkdata');
+                },
+                setlist:function(statu,list){//新建修改删除方法
+                	var that = this;
+                	if(statu==1){//新建
+                		$('#name').val('');
+                		var i = layer.open({
+                			title:false,
+			                type: 1,
+			                content: $('#create'),
+			                closeBtn: 0,
+			                zIndex: 99,
+			                area: ['300px', '200px'],
+			                btn: ['保存', '返回'],
+			                yes: function (c, d) {
+			                	var a = that.list.child;
+			                	a.push({
+			                		name:$('#name').val(),
+			                		child:[]
+			                	});
+			                	Vue.set(that.list,['child'],a)
+			                	layer.close(i);
+			                },
+			                cancel: function (a) {
+			                	layer.close(i);
+			                }
+			            });
+                	}else if(statu==2){//修改
+                		$('#name').val(list.name);
+                		var i = layer.open({
+                			title:false,
+			                type: 1,
+			                content: $('#create'),
+			                closeBtn: 0,
+			                zIndex: 99,
+			                area: ['300px', '200px'],
+			                btn: ['保存', '返回'],
+			                yes: function (c, d) {
+			                	list.name = $('#name').val();
+			                	layer.close(i);
+			                },
+			                cancel: function (a) {
+			                	layer.close(i);
+			                }
+			            });
+                	}else if(statu==3){//删除
+                		$('#name').val(list.name);
+                		var i = layer.open({
+                			title:false,
+			                type: 1,
+			                content: $('#del'),
+			                closeBtn: 0,
+			                zIndex: 99,
+			                area: ['300px', '150px'],
+			                btn: ['确定', '返回'],
+			                yes: function (c, d) {
+			                	layer.close(i);
+			                },
+			                cancel: function (a) {
+			                	layer.close(i);
+			                }
+			            });
+                	}
+                }
+            }
+        });
+        /* 创建实例 */
+        new Vue({
+            el:"#table-component-div",//挂载dom
+            data:{
+            	treedata:{
+            		list:ko_vue_data,//树列表
+            		checkListData:{},//选择的列表
+            		liveid:{}//正在被选的id
+            	}
+            }
+        })
+	</script>
+
+</html>
